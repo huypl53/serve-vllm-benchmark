@@ -1,0 +1,42 @@
+# vLLM Docker Compose Configuration
+# Usage: MODEL_ID=Qwen/Qwen2.5-VL-7B-Instruct docker compose -f docker/vllm.yaml up -d
+
+services:
+  vllm-server:
+    image: vllm/vllm-openai:latest
+    container_name: vlm-benchmark-vllm
+    runtime: nvidia
+    environment:
+      - NVIDIA_VISIBLE_DEVICES=all
+      - HUGGING_FACE_HUB_TOKEN=${HF_TOKEN:-${HUGGING_FACE_HUB_TOKEN:-}}
+    ports:
+      - "${VLLM_PORT:-8000}:8000"
+    volumes:
+      - ${HF_CACHE:-~/.cache/huggingface}:/root/.cache/huggingface
+    command: >
+      --model ${MODEL_ID:-Qwen/Qwen2.5-VL-7B-Instruct}
+      --trust-remote-code
+      --max-model-len ${MAX_MODEL_LEN:-4096}
+      --gpu-memory-utilization ${GPU_MEM_UTIL:-0.9}
+      --host 0.0.0.0
+      --port 8000
+      --dtype auto
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/v1/models"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 120s
+    restart: unless-stopped
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "100m"
+        max-file: "3"

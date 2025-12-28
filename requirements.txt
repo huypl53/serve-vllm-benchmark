@@ -1,0 +1,9 @@
+# VLM Benchmark Dependencies
+openai>=1.0.0          # vLLM OpenAI-compatible client
+huggingface-hub>=0.20  # TGI client, model downloads
+requests>=2.31         # HTTP requests
+pillow>=10.0           # Image loading
+pynvml>=11.5           # GPU monitoring
+pyyaml>=6.0            # Config files
+rich>=13.0             # Pretty console output
+tenacity>=8.2          # Retry logic with exponential backoff

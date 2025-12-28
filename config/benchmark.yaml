@@ -1,0 +1,70 @@
+# Benchmark Configuration
+
+benchmark:
+  # Warmup iterations (not counted in results)
+  warmup_iterations: 2
+
+  # Number of iterations per image
+  num_iterations: 3
+
+  # Generation parameters
+  max_new_tokens: 256
+  temperature: 0.7
+  top_p: 0.9
+
+  # Timeout for single inference (seconds)
+  inference_timeout: 120
+
+  # Retry configuration
+  max_retries: 3
+  retry_delay_base: 2.0  # Exponential backoff base
+
+server:
+  # Server startup timeout (seconds)
+  startup_timeout: 300
+
+  # Health check interval (seconds)
+  health_check_interval: 5
+
+  # Port mappings
+  ports:
+    vllm: 8000
+    tgi: 8080
+    tensorrt: 8001
+
+gpu:
+  # GPU monitoring interval (milliseconds)
+  monitor_interval_ms: 100
+
+  # Target GPU indices
+  target_gpus: [0]
+
+output:
+  # Results directory
+  results_dir: "./results"
+
+  # Save model outputs for quality review
+  save_model_outputs: true
+
+  # Timestamp format for filenames
+  timestamp_format: "%Y%m%d_%H%M%S"
+
+prompts:
+  # Default VQA prompt
+  default: "Describe this image in detail. What objects, people, or activities do you see?"
+
+  # Alternative prompts for different tasks
+  alternatives:
+    caption: "Provide a brief caption for this image."
+    detailed: "Analyze this image comprehensively. Describe all visible elements, their spatial relationships, colors, and any text present."
+    question: "What is the main subject of this image?"
+
+logging:
+  # Log level: DEBUG, INFO, WARNING, ERROR
+  level: "INFO"
+
+  # Log to file
+  log_file: "./results/benchmark.log"
+
+  # JSON structured logging
+  json_format: false

@@ -1,0 +1,130 @@
+# VLM Model Configurations
+# Each model defines supported platforms and their specific arguments
+
+models:
+  qwen2.5-vl-7b:
+    huggingface_id: "Qwen/Qwen2.5-VL-7B-Instruct"
+    display_name: "Qwen2.5-VL-7B"
+    memory_estimate_gb: 16
+    min_vram_gb: 16
+    platforms:
+      vllm:
+        supported: true
+        args:
+          trust_remote_code: true
+          max_model_len: 4096
+          gpu_memory_utilization: 0.9
+          limit_mm_per_prompt: 1
+      tgi:
+        supported: true
+        args:
+          max_input_length: 4096
+          max_total_tokens: 8192
+      tensorrt:
+        supported: true
+        backend: pytorch
+        args: {}
+
+  qwen2-vl-7b:
+    huggingface_id: "Qwen/Qwen2-VL-7B-Instruct"
+    display_name: "Qwen2-VL-7B"
+    memory_estimate_gb: 15
+    min_vram_gb: 16
+    platforms:
+      vllm:
+        supported: true
+        args:
+          trust_remote_code: true
+          max_model_len: 4096
+          gpu_memory_utilization: 0.9
+      tgi:
+        supported: true
+        args:
+          max_input_length: 4096
+          max_total_tokens: 8192
+      tensorrt:
+        supported: true
+        backend: native  # Best TensorRT support
+        args: {}
+
+  llama-3.2-vision-11b:
+    huggingface_id: "meta-llama/Llama-3.2-11B-Vision-Instruct"
+    display_name: "Llama-3.2-Vision-11B"
+    memory_estimate_gb: 24
+    min_vram_gb: 24  # Needs quantization on T4
+    quantization_for_t4: "awq"
+    platforms:
+      vllm:
+        supported: true
+        args:
+          trust_remote_code: true
+          max_model_len: 8192
+          enforce_eager: true
+          max_num_seqs: 16
+      tgi:
+        supported: true
+        args:
+          max_input_length: 8192
+          max_total_tokens: 16384
+      tensorrt:
+        supported: true
+        backend: pytorch
+        args: {}
+
+  minicpm-v-2.6:
+    huggingface_id: "openbmb/MiniCPM-V-2_6"
+    display_name: "MiniCPM-V-2.6"
+    memory_estimate_gb: 8
+    min_vram_gb: 12
+    platforms:
+      vllm:
+        supported: true
+        args:
+          trust_remote_code: true
+          max_model_len: 2048
+          gpu_memory_utilization: 0.9
+      tgi:
+        supported: true
+        args:
+          max_input_length: 2048
+          max_total_tokens: 4096
+      tensorrt:
+        supported: false  # Not supported in TensorRT-LLM
+        args: {}
+
+# GPU Profiles for automatic model selection
+gpu_profiles:
+  T4:
+    vram_gb: 16
+    supported_models:
+      - minicpm-v-2.6
+      - qwen2-vl-7b  # May need quantization
+      - qwen2.5-vl-7b  # May need quantization
+    notes: "Limited VRAM, prefer smaller models or quantization"
+
+  L4:
+    vram_gb: 24
+    supported_models:
+      - minicpm-v-2.6
+      - qwen2-vl-7b
+      - qwen2.5-vl-7b
+      - llama-3.2-vision-11b
+    notes: "Good for most 7B models"
+
+  A10:
+    vram_gb: 24
+    supported_models:
+      - minicpm-v-2.6
+      - qwen2-vl-7b
+      - qwen2.5-vl-7b
+      - llama-3.2-vision-11b
+    notes: "Good for most 7B models"
+
+  A100:
+    vram_gb: 80
+    supported_models:
+      - minicpm-v-2.6
+      - qwen2-vl-7b
+      - qwen2.5-vl-7b
+      - llama-3.2-vision-11b
+    notes: "Can run all models without quantization"

@@ -1,0 +1,48 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "vlm-benchmark"
+version = "0.1.0"
+description = "VLM Benchmarking System for vLLM, TGI, and TensorRT-LLM"
+readme = "README.md"
+requires-python = ">=3.10"
+license = {text = "MIT"}
+authors = [
+    {name = "VLM Benchmark Team"}
+]
+dependencies = [
+    "openai>=1.0.0",
+    "huggingface-hub>=0.20.0",
+    "requests>=2.31.0",
+    "pillow>=10.0.0",
+    "pynvml>=11.5.0",
+    "pyyaml>=6.0",
+    "rich>=13.0.0",
+    "tenacity>=8.2.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0.0",
+    "pytest-asyncio>=0.21.0",
+    "black>=23.0.0",
+    "ruff>=0.1.0",
+]
+
+[project.scripts]
+vlm-benchmark = "src.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["src*"]
+
+[tool.black]
+line-length = 100
+target-version = ["py310"]
+
+[tool.ruff]
+line-length = 100
+select = ["E", "F", "I", "N", "W"]
+ignore = ["E501"]
