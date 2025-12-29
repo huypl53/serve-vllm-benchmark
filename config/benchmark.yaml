@@ -51,13 +51,45 @@ output:
 
 prompts:
   # Default VQA prompt
-  default: "Describe this image in detail. What objects, people, or activities do you see?"
+  default: |
+    Bạn là trợ lý mô tả ảnh. Trả lời ngắn gọn bằng tiếng Việt.
+    Chỉ cung cấp 3 mục: Text, Objects, Actions.
+    Text và Objects phải là danh sách để dễ tách dữ liệu. Actions mô tả hành động chính.
+    Định dạng gợi ý (có thể giữ nguyên để dễ trích xuất):
+    Text: [mục1, mục2]
+    Objects: [mục1, mục2]
+    Actions: mô tả ngắn
+    Nếu không có, dùng [] cho danh sách.
 
   # Alternative prompts for different tasks
   alternatives:
-    caption: "Provide a brief caption for this image."
-    detailed: "Analyze this image comprehensively. Describe all visible elements, their spatial relationships, colors, and any text present."
-    question: "What is the main subject of this image?"
+    caption: |
+      Bạn là trợ lý mô tả ảnh. Trả lời ngắn gọn bằng tiếng Việt.
+      Chỉ cung cấp 3 mục: Text, Objects, Actions.
+      Text và Objects phải là danh sách để dễ tách dữ liệu. Actions mô tả hành động chính.
+      Định dạng gợi ý (có thể giữ nguyên để dễ trích xuất):
+      Text: [mục1, mục2]
+      Objects: [mục1, mục2]
+      Actions: mô tả ngắn
+      Nếu không có, dùng [] cho danh sách.
+    detailed: |
+      Bạn là trợ lý mô tả ảnh. Trả lời ngắn gọn bằng tiếng Việt.
+      Chỉ cung cấp 3 mục: Text, Objects, Actions.
+      Text và Objects phải là danh sách để dễ tách dữ liệu. Actions mô tả hành động chính.
+      Định dạng gợi ý (có thể giữ nguyên để dễ trích xuất):
+      Text: [mục1, mục2]
+      Objects: [mục1, mục2]
+      Actions: mô tả ngắn
+      Nếu không có, dùng [] cho danh sách.
+    question: |
+      Bạn là trợ lý mô tả ảnh. Trả lời ngắn gọn bằng tiếng Việt.
+      Chỉ cung cấp 3 mục: Text, Objects, Actions.
+      Text và Objects phải là danh sách để dễ tách dữ liệu. Actions mô tả hành động chính.
+      Định dạng gợi ý (có thể giữ nguyên để dễ trích xuất):
+      Text: [mục1, mục2]
+      Objects: [mục1, mục2]
+      Actions: mô tả ngắn
+      Nếu không có, dùng [] cho danh sách.
 
 logging:
   # Log level: DEBUG, INFO, WARNING, ERROR
