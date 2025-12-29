@@ -137,9 +137,16 @@ start_server() {
     local hf_id
     case $model in
         qwen2.5-vl-7b) hf_id="Qwen/Qwen2.5-VL-7B-Instruct" ;;
-        qwen2-vl-7b) hf_id="Qwen/Qwen2-VL-7B-Instruct" ;;
-        llama-3.2-vision-11b) hf_id="meta-llama/Llama-3.2-11B-Vision-Instruct" ;;
-        minicpm-v-2.6) hf_id="openbmb/MiniCPM-V-2_6" ;;
+        qwen2.5-vl-7b-w8a8) hf_id="RedHatAI/Qwen2.5-VL-7B-Instruct-quantized.w8a8" ;;
+        qwen2.5-vl-3b) hf_id="Qwen/Qwen2.5-VL-3B-Instruct" ;;
+        qwen2.5-vl-3b-w4a16) hf_id="RedHatAI/Qwen2.5-VL-3B-Instruct-quantized.w4a16" ;;
+        qwen3-vl-8b) hf_id="Qwen/Qwen3-VL-8B-Instruct" ;;
+        qwen3-vl-4b) hf_id="Qwen/Qwen3-VL-4B-Instruct" ;;
+        internvl3.5-1b) hf_id="OpenGVLab/InternVL3-1B" ;;
+        internvl3.5-2b) hf_id="OpenGVLab/InternVL3-2B" ;;
+        internvl3.5-4b) hf_id="OpenGVLab/InternVL3-4B" ;;
+        erax-vl-2b) hf_id="erax-ai/EraX-VL-2B-V1.5" ;;
+        vintern-1b) hf_id="5CD-AI/Vintern-1B-v3_5" ;;
         *) hf_id=$model ;;
     esac
 
