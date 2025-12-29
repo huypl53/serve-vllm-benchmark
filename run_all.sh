@@ -164,7 +164,7 @@ start_server() {
 # Function to wait for server
 wait_for_server() {
     local url=$1
-    local max_wait=600
+    local max_wait=900
     local wait_time=0
 
     echo -n "Waiting for server to be ready..."
