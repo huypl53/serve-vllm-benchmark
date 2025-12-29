@@ -48,6 +48,45 @@ models:
         backend: pytorch
         args: {}
 
+  # Quantized Models (pre-quantized from RedHatAI)
+  qwen2.5-vl-7b-w8a8:
+    huggingface_id: "RedHatAI/Qwen2.5-VL-7B-Instruct-quantized.w8a8"
+    display_name: "Qwen2.5-VL-7B-W8A8"
+    memory_estimate_gb: 8
+    min_vram_gb: 8
+    quantization: "w8a8"
+    platforms:
+      vllm:
+        supported: true
+        args:
+          trust_remote_code: true
+          max_model_len: 4096
+          gpu_memory_utilization: 0.9
+          limit_mm_per_prompt: 1
+      tgi:
+        supported: false
+      tensorrt:
+        supported: false
+
+  qwen2.5-vl-3b-w4a16:
+    huggingface_id: "RedHatAI/Qwen2.5-VL-3B-Instruct-quantized.w4a16"
+    display_name: "Qwen2.5-VL-3B-W4A16"
+    memory_estimate_gb: 4
+    min_vram_gb: 4
+    quantization: "w4a16"
+    platforms:
+      vllm:
+        supported: true
+        args:
+          trust_remote_code: true
+          max_model_len: 4096
+          gpu_memory_utilization: 0.9
+          limit_mm_per_prompt: 1
+      tgi:
+        supported: false
+      tensorrt:
+        supported: false
+
   qwen3-vl-8b:
     huggingface_id: "Qwen/Qwen3-VL-8B-Instruct"
     display_name: "Qwen3-VL-8B"
@@ -214,9 +253,11 @@ gpu_profiles:
       - vintern-1b
       - erax-vl-2b
       - qwen2.5-vl-3b
+      - qwen2.5-vl-3b-w4a16
       - qwen3-vl-4b
       - internvl3.5-4b
       - qwen2.5-vl-7b
+      - qwen2.5-vl-7b-w8a8
       - qwen3-vl-8b
     notes: "Limited VRAM, prefer smaller models or quantization"
 
@@ -228,9 +269,11 @@ gpu_profiles:
       - vintern-1b
       - erax-vl-2b
       - qwen2.5-vl-3b
+      - qwen2.5-vl-3b-w4a16
       - qwen3-vl-4b
       - internvl3.5-4b
       - qwen2.5-vl-7b
+      - qwen2.5-vl-7b-w8a8
       - qwen3-vl-8b
     notes: "Good for most models"
 
@@ -242,9 +285,11 @@ gpu_profiles:
       - vintern-1b
       - erax-vl-2b
       - qwen2.5-vl-3b
+      - qwen2.5-vl-3b-w4a16
       - qwen3-vl-4b
       - internvl3.5-4b
       - qwen2.5-vl-7b
+      - qwen2.5-vl-7b-w8a8
       - qwen3-vl-8b
     notes: "Good for most models"
 
@@ -256,8 +301,10 @@ gpu_profiles:
       - vintern-1b
       - erax-vl-2b
       - qwen2.5-vl-3b
+      - qwen2.5-vl-3b-w4a16
       - qwen3-vl-4b
       - internvl3.5-4b
       - qwen2.5-vl-7b
+      - qwen2.5-vl-7b-w8a8
       - qwen3-vl-8b
     notes: "Can run all models without quantization"
