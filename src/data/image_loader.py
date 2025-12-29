@@ -43,8 +43,8 @@ class ImageLoader:
         images = []
 
         for ext in SUPPORTED_EXTENSIONS:
-            images.extend(self.folder_path.glob(f"*{ext}"))
-            images.extend(self.folder_path.glob(f"*{ext.upper()}"))
+            images.extend(self.folder_path.rglob(f"*{ext}"))
+            images.extend(self.folder_path.rglob(f"*{ext.upper()}"))
 
         # Sort by name for reproducibility
         images = sorted(set(images), key=lambda p: p.name.lower())
