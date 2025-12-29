@@ -51,7 +51,16 @@ class OutputSettings:
 class PromptSettings:
     """Prompt templates."""
 
-    default: str = "Describe this image in detail."
+    default: str = (
+        "Bạn là trợ lý mô tả ảnh. Trả lời ngắn gọn bằng tiếng Việt.\n"
+        "Chỉ cung cấp 3 mục: Text, Objects, Actions.\n"
+        "Text và Objects phải là danh sách để dễ tách dữ liệu. Actions mô tả hành động chính.\n"
+        "Định dạng gợi ý (có thể giữ nguyên để dễ trích xuất):\n"
+        "Text: [mục1, mục2]\n"
+        "Objects: [mục1, mục2]\n"
+        "Actions: mô tả ngắn\n"
+        "Nếu không có, dùng [] cho danh sách."
+    )
     alternatives: dict = field(default_factory=dict)
 
 
