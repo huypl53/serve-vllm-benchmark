@@ -149,7 +149,7 @@ class VLLMPlatform(BasePlatform):
             model_id=model_id,
             platform=self.platform_name,
             quantization=self.platform_config.get("quantization"),
-            max_model_len=self.platform_config.get("args", {}).get("max_model_len", 4096),
+            max_model_len=self.platform_config.get("args", {}).get("max_model_len", 8192),
         )
 
     def inference_batch(

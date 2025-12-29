@@ -40,7 +40,7 @@ class ModelInfo:
     model_id: str
     platform: str
     quantization: str | None = None
-    max_model_len: int = 4096
+    max_model_len: int = 8192
 
 
 class InferenceError(Exception):

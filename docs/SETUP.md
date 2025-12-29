@@ -198,7 +198,7 @@ models:
         supported: true
         args:
           trust_remote_code: true
-          max_model_len: 4096
+          max_model_len: 8192
 ```
 
 ## Supported Models

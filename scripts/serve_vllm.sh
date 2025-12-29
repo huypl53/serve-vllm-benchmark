@@ -9,7 +9,7 @@ PORT=${PORT:-8000}
 TP=${TP:-1}
 DTYPE=${DTYPE:-"bfloat16"}  # use fp16 if GPU lacks bfloat16
 HOST=${HOST:-"0.0.0.0"}
-MAX_MODEL_LEN=${MAX_MODEL_LEN:-4096}
+MAX_MODEL_LEN=${MAX_MODEL_LEN:-8192}
 
 echo "Starting vLLM for ${MODEL_ID} on port ${PORT} (TP=${TP}, dtype=${DTYPE})"
 

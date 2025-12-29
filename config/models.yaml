@@ -12,14 +12,14 @@ models:
         supported: true
         args:
           trust_remote_code: true
-          max_model_len: 4096
+          max_model_len: 8192
           gpu_memory_utilization: 0.9
           limit_mm_per_prompt: 1
       tgi:
         supported: true
         args:
-          max_input_length: 4096
-          max_total_tokens: 8192
+          max_input_length: 8192
+          max_total_tokens: 16384
       tensorrt:
         supported: true
         backend: pytorch
@@ -35,14 +35,14 @@ models:
         supported: true
         args:
           trust_remote_code: true
-          max_model_len: 4096
+          max_model_len: 8192
           gpu_memory_utilization: 0.9
           limit_mm_per_prompt: 1
       tgi:
         supported: true
         args:
-          max_input_length: 4096
-          max_total_tokens: 8192
+          max_input_length: 8192
+          max_total_tokens: 16384
       tensorrt:
         supported: true
         backend: pytorch
@@ -60,7 +60,7 @@ models:
         supported: true
         args:
           trust_remote_code: true
-          max_model_len: 4096
+          max_model_len: 8192
           gpu_memory_utilization: 0.9
           limit_mm_per_prompt: 1
       tgi:
@@ -79,7 +79,7 @@ models:
         supported: true
         args:
           trust_remote_code: true
-          max_model_len: 4096
+          max_model_len: 8192
           gpu_memory_utilization: 0.9
           limit_mm_per_prompt: 1
       tgi:
@@ -97,14 +97,14 @@ models:
         supported: true
         args:
           trust_remote_code: true
-          max_model_len: 4096
+          max_model_len: 8192
           gpu_memory_utilization: 0.9
           limit_mm_per_prompt: 1
       tgi:
         supported: true
         args:
-          max_input_length: 4096
-          max_total_tokens: 8192
+          max_input_length: 8192
+          max_total_tokens: 16384
       tensorrt:
         supported: true
         backend: pytorch
@@ -120,14 +120,14 @@ models:
         supported: true
         args:
           trust_remote_code: true
-          max_model_len: 4096
+          max_model_len: 8192
           gpu_memory_utilization: 0.9
           limit_mm_per_prompt: 1
       tgi:
         supported: true
         args:
-          max_input_length: 4096
-          max_total_tokens: 8192
+          max_input_length: 8192
+          max_total_tokens: 16384
       tensorrt:
         supported: true
         backend: pytorch
@@ -143,13 +143,13 @@ models:
         supported: true
         args:
           trust_remote_code: true
-          max_model_len: 4096
+          max_model_len: 8192
           gpu_memory_utilization: 0.9
       tgi:
         supported: true
         args:
-          max_input_length: 4096
-          max_total_tokens: 8192
+          max_input_length: 8192
+          max_total_tokens: 16384
       tensorrt:
         supported: true
         backend: pytorch
@@ -165,13 +165,13 @@ models:
         supported: true
         args:
           trust_remote_code: true
-          max_model_len: 4096
+          max_model_len: 8192
           gpu_memory_utilization: 0.9
       tgi:
         supported: true
         args:
-          max_input_length: 4096
-          max_total_tokens: 8192
+          max_input_length: 8192
+          max_total_tokens: 16384
       tensorrt:
         supported: true
         backend: pytorch
@@ -187,13 +187,13 @@ models:
         supported: true
         args:
           trust_remote_code: true
-          max_model_len: 4096
+          max_model_len: 8192
           gpu_memory_utilization: 0.9
       tgi:
         supported: true
         args:
-          max_input_length: 4096
-          max_total_tokens: 8192
+          max_input_length: 8192
+          max_total_tokens: 16384
       tensorrt:
         supported: true
         backend: pytorch
@@ -209,13 +209,13 @@ models:
         supported: true
         args:
           trust_remote_code: true
-          max_model_len: 4096
+          max_model_len: 8192
           gpu_memory_utilization: 0.9
       tgi:
         supported: true
         args:
-          max_input_length: 4096
-          max_total_tokens: 8192
+          max_input_length: 8192
+          max_total_tokens: 16384
       tensorrt:
         supported: true
         backend: pytorch
@@ -231,13 +231,13 @@ models:
         supported: true
         args:
           trust_remote_code: true
-          max_model_len: 4096
+          max_model_len: 8192
           gpu_memory_utilization: 0.9
       tgi:
         supported: true
         args:
-          max_input_length: 4096
-          max_total_tokens: 8192
+          max_input_length: 8192
+          max_total_tokens: 16384
       tensorrt:
         supported: true
         backend: pytorch

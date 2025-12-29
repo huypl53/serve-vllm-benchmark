@@ -239,7 +239,7 @@ class TGIPlatform(BasePlatform):
                     model_id=info.get("model_id", "unknown"),
                     platform=self.platform_name,
                     quantization=info.get("quantization"),
-                    max_model_len=info.get("max_input_length", 4096),
+                    max_model_len=info.get("max_input_length", 8192),
                 )
         except Exception as e:
             logger.debug(f"Failed to get TGI model info: {e}")
