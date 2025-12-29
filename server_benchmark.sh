@@ -33,4 +33,4 @@ unzip -o "${tmp_zip}" -d images
 rm -f "${tmp_zip}"
 
 # Run benchmark.
-bash ./run_all.sh --images ./images
+bash ./run_all.sh --all-platforms --all-models --max-images 100

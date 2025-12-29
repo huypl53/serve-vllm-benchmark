@@ -56,7 +56,7 @@ while [[ $# -gt 0 ]]; do
             shift
             ;;
         --all-models)
-            MODELS="qwen2.5-vl-7b,qwen2-vl-7b,minicpm-v-2.6,llama-3.2-vision-11b"
+            MODELS="qwen2.5-vl-7b,qwen2.5-vl-3b,qwen3-vl-8b,qwen3-vl-4b,internvl3.5-2b,internvl3.5-4b,internvl3.5-1b,erax-vl-2b,vintern-1b"
             shift
             ;;
         --help)
