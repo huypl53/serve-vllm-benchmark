@@ -56,7 +56,7 @@ while [[ $# -gt 0 ]]; do
             shift
             ;;
         --all-models)
-            MODELS="qwen2.5-vl-7b,qwen2.5-vl-3b,qwen3-vl-8b,qwen3-vl-4b,internvl3.5-2b,internvl3.5-4b,internvl3.5-1b,erax-vl-2b,vintern-1b"
+            MODELS="qwen2.5-vl-7b,qwen2.5-vl-7b-w8a8,qwen2.5-vl-3b,qwen2.5-vl-3b-w4a16,qwen3-vl-8b,qwen3-vl-4b,internvl3.5-2b,internvl3.5-4b,internvl3.5-1b,erax-vl-2b,vintern-1b"
             shift
             ;;
         --help)
@@ -164,7 +164,7 @@ start_server() {
 # Function to wait for server
 wait_for_server() {
     local url=$1
-    local max_wait=600
+    local max_wait=900
     local wait_time=0
 
     echo -n "Waiting for server to be ready..."
