@@ -1,5 +1,6 @@
 """Main benchmarking orchestrator."""
 
+import asyncio
 import logging
 import signal
 import sys
@@ -88,6 +89,7 @@ class BenchmarkRunner:
         server_url: str,
         prompt: str | None = None,
         max_images: int | None = None,
+        concurrency: int | None = None,
     ) -> dict[str, Any]:
         """
         Run benchmark for a single platform/model combination.
@@ -98,10 +100,13 @@ class BenchmarkRunner:
             server_url: Server URL
             prompt: VQA prompt (uses default if None)
             max_images: Max images to process
+            concurrency: Number of concurrent requests (None uses config default)
 
         Returns:
             Dict with results and file paths
         """
+        # Use config default if not specified
+        concurrency = concurrency or self.config.benchmark.concurrency_level
         self._setup_signal_handlers()
 
         try:
@@ -166,6 +171,10 @@ class BenchmarkRunner:
             # Start GPU monitoring
             self.gpu_monitor.start()
 
+            # Show concurrency info
+            if concurrency > 1:
+                console.print(f"[blue]Using concurrent processing with {concurrency} parallel requests[/blue]")
+
             with Progress(
                 SpinnerColumn(),
                 TextColumn("[progress.description]{task.description}"),
@@ -179,41 +188,84 @@ class BenchmarkRunner:
                     total=len(images) * self.config.benchmark.num_iterations,
                 )
 
-                for filename, image in images:
+                if concurrency > 1:
+                    # Concurrent batch processing
                     for iteration in range(self.config.benchmark.num_iterations):
-                        result = platform.inference_with_retry(
-                            image=image,
-                            prompt=prompt,
-                            max_new_tokens=self.config.benchmark.max_new_tokens,
-                            temperature=self.config.benchmark.temperature,
-                        )
-
-                        metrics_collector.add_result(result)
-
-                        # Record detailed result
-                        detailed_results.append(
-                            create_detailed_result_row(
-                                platform=platform_name,
-                                model_id=model_info.model_id,
-                                image_file=filename,
-                                iteration=iteration,
-                                result=result,
+                        # Run all images concurrently for this iteration
+                        batch_results = asyncio.run(
+                            platform.inference_batch_concurrent(
+                                images=images,
+                                prompt=prompt,
+                                max_new_tokens=self.config.benchmark.max_new_tokens,
+                                temperature=self.config.benchmark.temperature,
+                                concurrency=concurrency,
                             )
                         )
 
-                        # Save first iteration output for quality review
-                        if iteration == 0 and self.config.output.save_model_outputs:
-                            model_outputs.append(
-                                create_model_output_row(
+                        for filename, result in batch_results:
+                            metrics_collector.add_result(result)
+
+                            # Record detailed result
+                            detailed_results.append(
+                                create_detailed_result_row(
                                     platform=platform_name,
                                     model_id=model_info.model_id,
                                     image_file=filename,
-                                    prompt=prompt,
-                                    output=result.output_text,
+                                    iteration=iteration,
+                                    result=result,
                                 )
                             )
 
-                        progress.advance(task)
+                            # Save first iteration output for quality review
+                            if iteration == 0 and self.config.output.save_model_outputs:
+                                model_outputs.append(
+                                    create_model_output_row(
+                                        platform=platform_name,
+                                        model_id=model_info.model_id,
+                                        image_file=filename,
+                                        prompt=prompt,
+                                        output=result.output_text,
+                                    )
+                                )
+
+                            progress.advance(task)
+                else:
+                    # Sequential processing (original behavior)
+                    for filename, image in images:
+                        for iteration in range(self.config.benchmark.num_iterations):
+                            result = platform.inference_with_retry(
+                                image=image,
+                                prompt=prompt,
+                                max_new_tokens=self.config.benchmark.max_new_tokens,
+                                temperature=self.config.benchmark.temperature,
+                            )
+
+                            metrics_collector.add_result(result)
+
+                            # Record detailed result
+                            detailed_results.append(
+                                create_detailed_result_row(
+                                    platform=platform_name,
+                                    model_id=model_info.model_id,
+                                    image_file=filename,
+                                    iteration=iteration,
+                                    result=result,
+                                )
+                            )
+
+                            # Save first iteration output for quality review
+                            if iteration == 0 and self.config.output.save_model_outputs:
+                                model_outputs.append(
+                                    create_model_output_row(
+                                        platform=platform_name,
+                                        model_id=model_info.model_id,
+                                        image_file=filename,
+                                        prompt=prompt,
+                                        output=result.output_text,
+                                    )
+                                )
+
+                            progress.advance(task)
 
             # Stop GPU monitoring
             gpu_result = self.gpu_monitor.stop()
@@ -292,6 +344,7 @@ class BenchmarkRunner:
         server_urls: dict[str, str] | None = None,
         prompt: str | None = None,
         max_images: int | None = None,
+        concurrency: int | None = None,
     ) -> list[dict[str, Any]]:
         """
         Run benchmarks for all specified platform/model combinations.
@@ -302,6 +355,7 @@ class BenchmarkRunner:
             server_urls: Dict mapping platform to URL
             prompt: VQA prompt
             max_images: Max images per benchmark
+            concurrency: Number of concurrent requests
 
         Returns:
             List of results
@@ -347,6 +401,7 @@ class BenchmarkRunner:
                     server_url=server_url,
                     prompt=prompt,
                     max_images=max_images,
+                    concurrency=concurrency,
                 )
 
                 results.append(result)
@@ -403,6 +458,7 @@ def run_benchmark(
     models_config_path: str = "./config/models.yaml",
     prompt: str | None = None,
     max_images: int | None = None,
+    concurrency: int | None = None,
 ) -> dict[str, Any]:
     """
     Convenience function to run a single benchmark.
@@ -417,6 +473,7 @@ def run_benchmark(
         models_config_path: Path to models config
         prompt: VQA prompt
         max_images: Max images
+        concurrency: Number of concurrent requests
 
     Returns:
         Benchmark result dict
@@ -437,4 +494,5 @@ def run_benchmark(
         server_url=server_url,
         prompt=prompt,
         max_images=max_images,
+        concurrency=concurrency,
     )

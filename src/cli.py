@@ -81,6 +81,7 @@ def cmd_benchmark(args):
         server_url=args.server_url,
         prompt=args.prompt,
         max_images=args.max_images,
+        concurrency=args.concurrency,
     )
 
     return 0 if result.get("success") else 1
@@ -122,6 +123,7 @@ def cmd_benchmark_all(args):
         server_urls=server_urls,
         prompt=args.prompt,
         max_images=args.max_images,
+        concurrency=args.concurrency,
     )
 
     # Return success if at least one benchmark succeeded
@@ -306,6 +308,11 @@ def main():
         type=int,
         help="Maximum number of images to process",
     )
+    bench_parser.add_argument(
+        "--concurrency",
+        type=int,
+        help="Number of concurrent requests (default: 1 = sequential)",
+    )
 
     # Benchmark all command
     all_parser = subparsers.add_parser(
@@ -351,6 +358,11 @@ def main():
         "--max-images",
         type=int,
         help="Maximum images per benchmark",
+    )
+    all_parser.add_argument(
+        "--concurrency",
+        type=int,
+        help="Number of concurrent requests (default: 1 = sequential)",
     )
 
     # List command

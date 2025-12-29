@@ -19,6 +19,7 @@ class BenchmarkSettings:
     inference_timeout: int = 120
     max_retries: int = 3
     retry_delay_base: float = 2.0
+    concurrency_level: int = 1  # Number of concurrent requests (1 = sequential)
 
 
 @dataclass

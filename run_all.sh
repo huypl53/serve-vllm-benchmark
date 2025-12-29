@@ -18,6 +18,7 @@ IMAGE_DIR="./images"
 OUTPUT_DIR="./results"
 MAX_IMAGES=""
 PROMPT=""
+CONCURRENCY=""  # Number of concurrent requests (empty = use config default)
 PLATFORMS="vllm"  # Start with vLLM only by default
 MODELS="qwen2.5-vl-7b"  # Start with one model
 VLLM_PORT=8000
@@ -41,6 +42,10 @@ while [[ $# -gt 0 ]]; do
             ;;
         --prompt)
             PROMPT="$2"
+            shift 2
+            ;;
+        --concurrency)
+            CONCURRENCY="$2"
             shift 2
             ;;
         --platforms)
@@ -67,6 +72,7 @@ while [[ $# -gt 0 ]]; do
             echo "  --output DIR        Output folder (default: ./results)"
             echo "  --max-images N      Max images to process"
             echo "  --prompt TEXT       VQA prompt"
+            echo "  --concurrency N     Number of concurrent requests (default: 1)"
             echo "  --platforms LIST    Comma-separated platforms (default: vllm)"
             echo "  --models LIST       Comma-separated models (default: qwen2.5-vl-7b)"
             echo "  --all-platforms     Test all platforms (vllm,tgi,tensorrt)"
@@ -222,6 +228,10 @@ run_benchmark() {
 
     if [ -n "$PROMPT" ]; then
         cmd="$cmd --prompt \"$PROMPT\""
+    fi
+
+    if [ -n "$CONCURRENCY" ]; then
+        cmd="$cmd --concurrency $CONCURRENCY"
     fi
 
     eval $cmd

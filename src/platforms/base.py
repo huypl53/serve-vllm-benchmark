@@ -1,5 +1,6 @@
 """Abstract base class for inference platforms with retry logic."""
 
+import asyncio
 import logging
 import time
 from abc import ABC, abstractmethod
@@ -139,6 +140,41 @@ class BasePlatform(ABC):
     def _do_get_model_info(self) -> ModelInfo:
         """Internal model info implementation."""
         pass
+
+    async def _do_inference_async(
+        self,
+        image: Image.Image,
+        prompt: str,
+        max_new_tokens: int,
+        temperature: float,
+        **kwargs,
+    ) -> InferenceResult:
+        """
+        Async inference implementation. Override in subclasses for true async.
+        Default implementation wraps sync method in executor.
+
+        Args:
+            image: PIL Image to analyze
+            prompt: Text prompt
+            max_new_tokens: Maximum tokens to generate
+            temperature: Sampling temperature
+            **kwargs: Additional arguments
+
+        Returns:
+            InferenceResult with timing and output
+        """
+        # Default: run sync method in thread pool executor
+        loop = asyncio.get_event_loop()
+        return await loop.run_in_executor(
+            None,
+            lambda: self._do_inference(
+                image=image,
+                prompt=prompt,
+                max_new_tokens=max_new_tokens,
+                temperature=temperature,
+                **kwargs,
+            ),
+        )
 
     def connect(self, server_url: str, timeout: int = 300) -> bool:
         """
@@ -328,6 +364,70 @@ class BasePlatform(ABC):
         self._is_connected = False
         self._client = None
         logger.info(f"Disconnected from {self.platform_name}")
+
+    async def inference_batch_concurrent(
+        self,
+        images: list[tuple[str, Image.Image]],
+        prompt: str,
+        max_new_tokens: int = 256,
+        temperature: float = 0.7,
+        concurrency: int = 4,
+        **kwargs,
+    ) -> list[tuple[str, InferenceResult]]:
+        """
+        Run inference on multiple images concurrently.
+
+        Args:
+            images: List of (filename, PIL.Image) tuples
+            prompt: Text prompt
+            max_new_tokens: Maximum tokens to generate
+            temperature: Sampling temperature
+            concurrency: Maximum concurrent requests
+            **kwargs: Additional arguments
+
+        Returns:
+            List of (filename, InferenceResult) tuples in same order as input
+        """
+        if not self._is_connected:
+            raise ConnectionError(f"{self.platform_name} is not connected")
+
+        semaphore = asyncio.Semaphore(concurrency)
+
+        async def process_one(filename: str, image: Image.Image) -> tuple[str, InferenceResult]:
+            async with semaphore:
+                try:
+                    result = await self._do_inference_async(
+                        image=image,
+                        prompt=prompt,
+                        max_new_tokens=max_new_tokens,
+                        temperature=temperature,
+                        **kwargs,
+                    )
+                    return (filename, result)
+                except Exception as e:
+                    logger.error(f"Async inference failed for {filename}: {e}")
+                    return (
+                        filename,
+                        InferenceResult(
+                            output_text="",
+                            prompt_tokens=0,
+                            completion_tokens=0,
+                            total_tokens=0,
+                            time_to_first_token_ms=0,
+                            total_latency_ms=0,
+                            tokens_per_second=0,
+                            success=False,
+                            error_message=str(e),
+                        ),
+                    )
+
+        # Create tasks for all images
+        tasks = [process_one(fn, img) for fn, img in images]
+
+        # Run all tasks concurrently (semaphore limits actual concurrency)
+        results = await asyncio.gather(*tasks)
+
+        return list(results)
 
     def __enter__(self):
         """Context manager entry."""

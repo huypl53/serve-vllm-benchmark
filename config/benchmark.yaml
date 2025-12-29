@@ -17,7 +17,10 @@ benchmark:
 
   # Retry configuration
   max_retries: 3
-  retry_delay_base: 2.0  # Exponential backoff base
+  retry_delay_base: 2.0 # Exponential backoff base
+
+  # Concurrent requests (1 = sequential, >1 = parallel batch processing)
+  concurrency_level: 4
 
 server:
   # Server startup timeout (seconds)

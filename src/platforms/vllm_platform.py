@@ -9,6 +9,12 @@ from PIL import Image
 
 from .base import BasePlatform, InferenceResult, ModelInfo
 
+# Import for type hints
+try:
+    from openai import AsyncOpenAI
+except ImportError:
+    AsyncOpenAI = None
+
 logger = logging.getLogger(__name__)
 
 
@@ -22,12 +28,18 @@ class VLLMPlatform(BasePlatform):
     def _do_connect(self, server_url: str) -> bool:
         """Connect to vLLM server."""
         try:
-            from openai import OpenAI
+            from openai import OpenAI, AsyncOpenAI
 
             # vLLM provides OpenAI-compatible API
             self._client = OpenAI(
                 base_url=f"{server_url}/v1",
                 api_key="not-needed",  # vLLM doesn't require real API key
+                timeout=60.0,
+            )
+            # Also create async client for concurrent requests
+            self._async_client = AsyncOpenAI(
+                base_url=f"{server_url}/v1",
+                api_key="not-needed",
                 timeout=60.0,
             )
             return True
@@ -181,3 +193,86 @@ class VLLMPlatform(BasePlatform):
             )
             results.append((filename, result))
         return results
+
+    async def _do_inference_async(
+        self,
+        image: Image.Image,
+        prompt: str,
+        max_new_tokens: int,
+        temperature: float,
+        **kwargs,
+    ) -> InferenceResult:
+        """Run async inference on vLLM server."""
+        image_url = self._encode_image(image)
+
+        # Build messages with image
+        messages = [
+            {
+                "role": "user",
+                "content": [
+                    {"type": "text", "text": prompt},
+                    {"type": "image_url", "image_url": {"url": image_url}},
+                ],
+            }
+        ]
+
+        # Get model ID
+        model_id = self.model_config.get("huggingface_id", "")
+
+        start_time = time.perf_counter()
+        ttft = None
+        output_text = ""
+        completion_tokens = 0
+
+        try:
+            # Use async streaming to capture TTFT accurately
+            stream = await self._async_client.chat.completions.create(
+                model=model_id,
+                messages=messages,
+                max_tokens=max_new_tokens,
+                temperature=temperature,
+                top_p=kwargs.get("top_p", 0.9),
+                stream=True,
+            )
+
+            async for chunk in stream:
+                if ttft is None:
+                    ttft = (time.perf_counter() - start_time) * 1000
+
+                if chunk.choices and chunk.choices[0].delta.content:
+                    output_text += chunk.choices[0].delta.content
+                    completion_tokens += 1
+
+            total_latency = (time.perf_counter() - start_time) * 1000
+
+            # Calculate tokens per second
+            generation_time = total_latency - (ttft or 0)
+            tokens_per_second = (
+                completion_tokens / (generation_time / 1000) if generation_time > 0 else 0
+            )
+
+            return InferenceResult(
+                output_text=output_text,
+                prompt_tokens=0,  # Not available in streaming mode
+                completion_tokens=completion_tokens,
+                total_tokens=completion_tokens,
+                time_to_first_token_ms=ttft or 0,
+                total_latency_ms=total_latency,
+                tokens_per_second=tokens_per_second,
+                success=True,
+            )
+
+        except Exception as e:
+            total_latency = (time.perf_counter() - start_time) * 1000
+            logger.error(f"vLLM async inference error: {e}")
+            return InferenceResult(
+                output_text="",
+                prompt_tokens=0,
+                completion_tokens=0,
+                total_tokens=0,
+                time_to_first_token_ms=0,
+                total_latency_ms=total_latency,
+                tokens_per_second=0,
+                success=False,
+                error_message=str(e),
+            )
