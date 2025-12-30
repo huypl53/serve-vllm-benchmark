@@ -54,12 +54,25 @@ class TGIPlatform(BasePlatform):
             logger.debug(f"TGI health check failed: {e}")
             return False
 
-    def _encode_image(self, image: Image.Image) -> str:
-        """Convert PIL Image to base64 data URL."""
+    def _encode_image(self, image: Image.Image, max_size: int = 1024, quality: int = 85) -> str:
+        """Convert PIL Image to base64 data URL with resizing and compression.
+
+        TGI has payload size limits, so we resize large images and use JPEG compression.
+        """
+        # Resize if image is too large
+        if max(image.size) > max_size:
+            image = image.copy()
+            image.thumbnail((max_size, max_size), Image.Resampling.LANCZOS)
+
+        # Convert to RGB if necessary (JPEG doesn't support RGBA)
+        if image.mode in ('RGBA', 'P'):
+            image = image.convert('RGB')
+
         buffer = BytesIO()
-        image.save(buffer, format="PNG")
+        # Use JPEG for smaller file size
+        image.save(buffer, format="JPEG", quality=quality, optimize=True)
         b64_data = base64.b64encode(buffer.getvalue()).decode("utf-8")
-        return f"data:image/png;base64,{b64_data}"
+        return f"data:image/jpeg;base64,{b64_data}"
 
     def _do_inference(
         self,
