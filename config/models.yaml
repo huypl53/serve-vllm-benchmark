@@ -134,8 +134,8 @@ models:
         args: {}
 
   internvl3.5-2b:
-    huggingface_id: "InternVL3.5-2B-Instruct"
-    display_name: "InternVL3.5-2B"
+    huggingface_id: "OpenGVLab/InternVL3_5-2B-Instruct"
+    display_name: "InternVL3_5-2B-Instruct"
     memory_estimate_gb: 6
     min_vram_gb: 6
     platforms:
@@ -156,8 +156,8 @@ models:
         args: {}
 
   internvl3.5-4b:
-    huggingface_id: "InternVL3.5-4B-Instruct"
-    display_name: "InternVL3.5-4B"
+    huggingface_id: "OpenGVLab/InternVL3_5-4B-Instruct"
+    display_name: "InternVL3_5-4B-Instruct"
     memory_estimate_gb: 10
     min_vram_gb: 10
     platforms:
@@ -178,8 +178,8 @@ models:
         args: {}
 
   internvl3.5-1b:
-    huggingface_id: "InternVL3.5-1B-Instruct"
-    display_name: "InternVL3.5-1B"
+    huggingface_id: "OpenGVLab/InternVL3_5-1B-Instruct"
+    display_name: "InternVL3_5-1B-Instruct"
     memory_estimate_gb: 4
     min_vram_gb: 4
     platforms:
