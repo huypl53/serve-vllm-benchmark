@@ -164,8 +164,8 @@ print(model_config.get('huggingface_id', '$model'))
             wait_for_server "http://localhost:$TGI_PORT/health"
             ;;
         tensorrt)
-            docker compose -f docker/tensorrt.yaml up -d
-            wait_for_server "http://localhost:$TENSORRT_PORT/v2/health/ready"
+            docker compose -f docker/tensorrt.yaml --profile serve up -d
+            wait_for_server "http://localhost:$TENSORRT_PORT/v1/models"
             ;;
     esac
 }
@@ -199,7 +199,7 @@ stop_server() {
     case $platform in
         vllm) docker compose -f docker/vllm.yaml down ;;
         tgi) docker compose -f docker/tgi.yaml down ;;
-        tensorrt) docker compose -f docker/tensorrt.yaml down ;;
+        tensorrt) docker compose -f docker/tensorrt.yaml --profile serve down ;;
     esac
 }
 
