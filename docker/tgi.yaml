@@ -5,7 +5,6 @@ services:
   tgi-server:
     image: ghcr.io/huggingface/text-generation-inference:latest
     container_name: vlm-benchmark-tgi
-    runtime: nvidia
     environment:
       - NVIDIA_VISIBLE_DEVICES=all
       - HUGGING_FACE_HUB_TOKEN=${HF_TOKEN:-${HUGGING_FACE_HUB_TOKEN:-}}

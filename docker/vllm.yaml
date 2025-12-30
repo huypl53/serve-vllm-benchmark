@@ -5,7 +5,6 @@ services:
   vllm-server:
     image: vllm/vllm-openai:latest
     container_name: vlm-benchmark-vllm
-    runtime: nvidia
     environment:
       - NVIDIA_VISIBLE_DEVICES=all
       - HUGGING_FACE_HUB_TOKEN=${HF_TOKEN:-${HUGGING_FACE_HUB_TOKEN:-}}

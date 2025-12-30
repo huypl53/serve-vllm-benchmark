@@ -7,7 +7,6 @@ services:
   tensorrt-serve:
     image: nvcr.io/nvidia/tensorrt-llm:latest
     container_name: vlm-benchmark-tensorrt
-    runtime: nvidia
     environment:
       - NVIDIA_VISIBLE_DEVICES=all
       - HUGGING_FACE_HUB_TOKEN=${HF_TOKEN:-${HUGGING_FACE_HUB_TOKEN:-}}
@@ -48,7 +47,6 @@ services:
   tensorrt-triton:
     image: nvcr.io/nvidia/tritonserver:24.08-trtllm-python-py3
     container_name: vlm-benchmark-triton
-    runtime: nvidia
     environment:
       - NVIDIA_VISIBLE_DEVICES=all
     ports:
