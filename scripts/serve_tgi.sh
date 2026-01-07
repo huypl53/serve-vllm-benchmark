@@ -12,8 +12,8 @@ CONTAINER=${CONTAINER:-"ghcr.io/huggingface/text-generation-inference:3.3.5"}
 docker run --gpus all --rm --net host \
   -e HF_TOKEN="${HF_TOKEN:-}" \
   -e MAX_BATCH_PREFILL_TOKENS=32768 \
-  -e MAX_INPUT_LENGTH=4096 \
-  -e MAX_TOTAL_TOKENS=6144 \
+  -e MAX_INPUT_LENGTH=8192 \
+  -e MAX_TOTAL_TOKENS=16384 \
   -v "${HF_HOME:-$HOME/.cache/huggingface}":/data \
   "${CONTAINER}" \
   --model-id "${MODEL_ID}" \

@@ -1,0 +1,79 @@
+# TensorRT-LLM Docker Compose Configuration (via trtllm-serve or Triton)
+# Note: TensorRT-LLM has limited VLM support. Best for Qwen2-VL models.
+# Usage: MODEL_ID=Qwen/Qwen2-VL-7B-Instruct docker compose -f docker/tensorrt.yaml up -d
+
+services:
+  # Option 1: trtllm-serve (OpenAI-compatible, simpler setup)
+  tensorrt-serve:
+    image: nvcr.io/nvidia/tensorrt-llm:latest
+    container_name: vlm-benchmark-tensorrt
+    environment:
+      - NVIDIA_VISIBLE_DEVICES=all
+      - HUGGING_FACE_HUB_TOKEN=${HF_TOKEN:-${HUGGING_FACE_HUB_TOKEN:-}}
+    ports:
+      - "${TENSORRT_PORT:-8001}:8000"
+    volumes:
+      - ${HF_CACHE:-~/.cache/huggingface}:/root/.cache/huggingface
+      - ./tensorrt_engines:/engines
+    command: >
+      trtllm-serve
+      --model ${MODEL_ID:-Qwen/Qwen2-VL-7B-Instruct}
+      --backend pytorch
+      --host 0.0.0.0
+      --port 8000
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/v1/models"]
+      interval: 30s
+      timeout: 10s
+      retries: 10
+      start_period: 300s
+    restart: unless-stopped
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "100m"
+        max-file: "3"
+    profiles:
+      - serve
+
+  # Option 2: Triton Inference Server (more complex, higher performance)
+  tensorrt-triton:
+    image: nvcr.io/nvidia/tritonserver:24.08-trtllm-python-py3
+    container_name: vlm-benchmark-triton
+    environment:
+      - NVIDIA_VISIBLE_DEVICES=all
+    ports:
+      - "${TENSORRT_PORT:-8001}:8000"
+      - "8002:8001"  # GRPC
+      - "8003:8002"  # Metrics
+    volumes:
+      - ./model_repository:/models
+    command: tritonserver --model-repository=/models
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/v2/health/ready"]
+      interval: 30s
+      timeout: 10s
+      retries: 10
+      start_period: 300s
+    restart: unless-stopped
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "100m"
+        max-file: "3"
+    profiles:
+      - triton

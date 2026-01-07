@@ -1,0 +1,38 @@
+# TGI (Text Generation Inference) Docker Compose Configuration
+# Usage: MODEL_ID=Qwen/Qwen2.5-VL-7B-Instruct docker compose -f docker/tgi.yaml up -d
+
+services:
+  tgi-server:
+    image: ghcr.io/huggingface/text-generation-inference:latest
+    container_name: vlm-benchmark-tgi
+    environment:
+      - NVIDIA_VISIBLE_DEVICES=all
+      - HUGGING_FACE_HUB_TOKEN=${HF_TOKEN:-${HUGGING_FACE_HUB_TOKEN:-}}
+    ports:
+      - "${TGI_PORT:-8080}:80"
+    volumes:
+      - ${HF_CACHE:-~/.cache/huggingface}:/data
+    command: >
+      --model-id ${MODEL_ID:-Qwen/Qwen2.5-VL-7B-Instruct}
+      --max-input-length ${MAX_INPUT_LEN:-8192}
+      --max-total-tokens ${MAX_TOTAL_TOKENS:-16384}
+      --max-batch-prefill-tokens ${MAX_BATCH_PREFILL:-8192}
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:80/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 120s
+    restart: unless-stopped
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "100m"
+        max-file: "3"
