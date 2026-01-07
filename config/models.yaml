@@ -237,6 +237,60 @@ models:
         backend: pytorch
         args: {}
 
+  vistral-7b-chat:
+    huggingface_id: "Viet-Mistral/Vistral-7B-Chat"
+    display_name: "Vistral-7B-Chat"
+    memory_estimate_gb: 16
+    min_vram_gb: 14
+    platforms:
+      vllm:
+        supported: true
+        args:
+          trust_remote_code: true
+          max_model_len: 8192
+          gpu_memory_utilization: 0.9
+          limit_mm_per_prompt: 1
+      tgi:
+        supported: false
+      tensorrt:
+        supported: false
+
+  pangea-7b:
+    huggingface_id: "neulab/Pangea-7B"
+    display_name: "Pangea-7B"
+    memory_estimate_gb: 16
+    min_vram_gb: 14
+    platforms:
+      vllm:
+        supported: true
+        args:
+          trust_remote_code: true
+          max_model_len: 8192
+          gpu_memory_utilization: 0.9
+          limit_mm_per_prompt: 1
+      tgi:
+        supported: false
+      tensorrt:
+        supported: false
+
+  lavy-instruct:
+    huggingface_id: "chitb/Lavy-instruct"
+    display_name: "Lavy-instruct"
+    memory_estimate_gb: 8
+    min_vram_gb: 6
+    platforms:
+      vllm:
+        supported: true
+        args:
+          trust_remote_code: true
+          max_model_len: 8192
+          gpu_memory_utilization: 0.9
+          limit_mm_per_prompt: 1
+      tgi:
+        supported: false
+      tensorrt:
+        supported: false
+
 # GPU Profiles for automatic model selection
 gpu_profiles:
   T4:
@@ -253,6 +307,7 @@ gpu_profiles:
       - qwen2.5-vl-7b
       - qwen2.5-vl-7b-w8a8
       - qwen3-vl-8b
+      - lavy-instruct
     notes: "Limited VRAM, prefer smaller models or quantization"
 
   L4:
@@ -269,6 +324,9 @@ gpu_profiles:
       - qwen2.5-vl-7b
       - qwen2.5-vl-7b-w8a8
       - qwen3-vl-8b
+      - lavy-instruct
+      - vistral-7b-chat
+      - pangea-7b
     notes: "Good for most models"
 
   A10:
@@ -285,6 +343,9 @@ gpu_profiles:
       - qwen2.5-vl-7b
       - qwen2.5-vl-7b-w8a8
       - qwen3-vl-8b
+      - lavy-instruct
+      - vistral-7b-chat
+      - pangea-7b
     notes: "Good for most models"
 
   A100:
@@ -301,4 +362,7 @@ gpu_profiles:
       - qwen2.5-vl-7b
       - qwen2.5-vl-7b-w8a8
       - qwen3-vl-8b
+      - lavy-instruct
+      - vistral-7b-chat
+      - pangea-7b
     notes: "Can run all models without quantization"

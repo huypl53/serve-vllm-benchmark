@@ -23,6 +23,7 @@ from .data.image_loader import ImageLoader
 from .metrics.collector import MetricsCollector, AggregatedMetrics
 from .metrics.gpu_monitor import GPUMonitor, detect_gpu_type, get_gpu_info
 from .output.csv_writer import CSVWriter, create_detailed_result_row, create_model_output_row
+from .output.markdown_writer import MarkdownWriter
 from .platforms import PLATFORM_REGISTRY, get_platform_class
 from .platforms.base import BasePlatform, InferenceResult
 
@@ -54,6 +55,8 @@ class BenchmarkRunner:
         self.image_loader = ImageLoader(image_folder)
         self.output_dir = output_dir or config.output.results_dir
         self.csv_writer = CSVWriter(self.output_dir, config.output.timestamp_format)
+        self.markdown_writer = MarkdownWriter(self.output_dir, config.output.timestamp_format)
+        self._first_iteration_images: list[tuple[str, Any]] = []
 
         # GPU monitoring
         gpu_index = config.gpu.target_gpus[0] if config.gpu.target_gpus else 0
@@ -191,6 +194,10 @@ class BenchmarkRunner:
                 if concurrency > 1:
                     # Concurrent batch processing
                     for iteration in range(self.config.benchmark.num_iterations):
+                        # Reset images storage for first iteration
+                        if iteration == 0:
+                            self._first_iteration_images = []
+
                         # Run all images concurrently for this iteration
                         batch_results = asyncio.run(
                             platform.inference_batch_concurrent(
@@ -199,6 +206,7 @@ class BenchmarkRunner:
                                 max_new_tokens=self.config.benchmark.max_new_tokens,
                                 temperature=self.config.benchmark.temperature,
                                 concurrency=concurrency,
+                                iteration=iteration,
                             )
                         )
 
@@ -216,8 +224,14 @@ class BenchmarkRunner:
                                 )
                             )
 
-                            # Save first iteration output for quality review
+                            # Save first iteration output for quality review and capture images
                             if iteration == 0 and self.config.output.save_model_outputs:
+                                # Find the corresponding image
+                                for img_filename, image in images:
+                                    if img_filename == filename:
+                                        self._first_iteration_images.append((filename, image))
+                                        break
+
                                 model_outputs.append(
                                     create_model_output_row(
                                         platform=platform_name,
@@ -232,12 +246,17 @@ class BenchmarkRunner:
                 else:
                     # Sequential processing (original behavior)
                     for filename, image in images:
+                        # Reset images storage for first image of first iteration
+                        if filename == images[0][0]:
+                            self._first_iteration_images = []
+
                         for iteration in range(self.config.benchmark.num_iterations):
                             result = platform.inference_with_retry(
                                 image=image,
                                 prompt=prompt,
                                 max_new_tokens=self.config.benchmark.max_new_tokens,
                                 temperature=self.config.benchmark.temperature,
+                                iteration=iteration,
                             )
 
                             metrics_collector.add_result(result)
@@ -253,8 +272,9 @@ class BenchmarkRunner:
                                 )
                             )
 
-                            # Save first iteration output for quality review
+                            # Save first iteration output for quality review and capture images
                             if iteration == 0 and self.config.output.save_model_outputs:
+                                self._first_iteration_images.append((filename, image))
                                 model_outputs.append(
                                     create_model_output_row(
                                         platform=platform_name,
@@ -282,6 +302,17 @@ class BenchmarkRunner:
                 detailed_results=detailed_results,
                 model_outputs=model_outputs if self.config.output.save_model_outputs else None,
             )
+
+            # Write markdown examples with embedded images
+            if self.config.output.save_model_outputs and self._first_iteration_images:
+                paths["markdown"] = self.markdown_writer.write_example_responses(
+                    platform=platform_name,
+                    model_id=model_info.model_id,
+                    metrics=aggregated,
+                    model_outputs=model_outputs,
+                    images=self._first_iteration_images,
+                    detailed_results=detailed_results,
+                )
 
             # Print summary
             self._print_summary(platform_name, model_info.model_id, aggregated)

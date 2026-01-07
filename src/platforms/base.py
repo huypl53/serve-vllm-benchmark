@@ -119,6 +119,7 @@ class BasePlatform(ABC):
         prompt: str,
         max_new_tokens: int,
         temperature: float,
+        iteration: int = 0,
         **kwargs,
     ) -> InferenceResult:
         """
@@ -129,6 +130,7 @@ class BasePlatform(ABC):
             prompt: Text prompt
             max_new_tokens: Maximum tokens to generate
             temperature: Sampling temperature
+            iteration: Iteration number (for cache bypass)
             **kwargs: Additional arguments
 
         Returns:
@@ -147,6 +149,7 @@ class BasePlatform(ABC):
         prompt: str,
         max_new_tokens: int,
         temperature: float,
+        iteration: int = 0,
         **kwargs,
     ) -> InferenceResult:
         """
@@ -158,6 +161,7 @@ class BasePlatform(ABC):
             prompt: Text prompt
             max_new_tokens: Maximum tokens to generate
             temperature: Sampling temperature
+            iteration: Iteration number (for cache bypass)
             **kwargs: Additional arguments
 
         Returns:
@@ -172,6 +176,7 @@ class BasePlatform(ABC):
                 prompt=prompt,
                 max_new_tokens=max_new_tokens,
                 temperature=temperature,
+                iteration=iteration,
                 **kwargs,
             ),
         )
@@ -240,6 +245,7 @@ class BasePlatform(ABC):
         prompt: str,
         max_new_tokens: int = 256,
         temperature: float = 0.7,
+        iteration: int = 0,
         **kwargs,
     ) -> InferenceResult:
         """
@@ -250,6 +256,7 @@ class BasePlatform(ABC):
             prompt: Text prompt
             max_new_tokens: Maximum tokens to generate
             temperature: Sampling temperature
+            iteration: Iteration number (for cache bypass)
 
         Returns:
             InferenceResult with timing and output
@@ -263,6 +270,7 @@ class BasePlatform(ABC):
                 prompt=prompt,
                 max_new_tokens=max_new_tokens,
                 temperature=temperature,
+                iteration=iteration,
                 **kwargs,
             )
         except Exception as e:
@@ -287,6 +295,7 @@ class BasePlatform(ABC):
         max_new_tokens: int = 256,
         temperature: float = 0.7,
         max_retries: int | None = None,
+        iteration: int = 0,
         **kwargs,
     ) -> InferenceResult:
         """
@@ -298,6 +307,7 @@ class BasePlatform(ABC):
             max_new_tokens: Max tokens
             temperature: Temperature
             max_retries: Override default max retries
+            iteration: Iteration number (for cache bypass)
 
         Returns:
             InferenceResult
@@ -312,6 +322,7 @@ class BasePlatform(ABC):
                     prompt=prompt,
                     max_new_tokens=max_new_tokens,
                     temperature=temperature,
+                    iteration=iteration,
                     **kwargs,
                 )
                 if result.success:
@@ -372,6 +383,7 @@ class BasePlatform(ABC):
         max_new_tokens: int = 256,
         temperature: float = 0.7,
         concurrency: int = 4,
+        iteration: int = 0,
         **kwargs,
     ) -> list[tuple[str, InferenceResult]]:
         """
@@ -383,6 +395,7 @@ class BasePlatform(ABC):
             max_new_tokens: Maximum tokens to generate
             temperature: Sampling temperature
             concurrency: Maximum concurrent requests
+            iteration: Iteration number (for cache bypass)
             **kwargs: Additional arguments
 
         Returns:
@@ -401,6 +414,7 @@ class BasePlatform(ABC):
                         prompt=prompt,
                         max_new_tokens=max_new_tokens,
                         temperature=temperature,
+                        iteration=iteration,
                         **kwargs,
                     )
                     return (filename, result)
