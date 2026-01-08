@@ -94,6 +94,7 @@ class TensorRTPlatform(BasePlatform):
         prompt: str,
         max_new_tokens: int,
         temperature: float,
+        iteration: int = 0,
         **kwargs,
     ) -> InferenceResult:
         """Run inference on TensorRT-LLM server."""
@@ -308,19 +309,20 @@ class TensorRTPlatform(BasePlatform):
         prompt: str,
         max_new_tokens: int,
         temperature: float,
+        iteration: int = 0,
         **kwargs,
     ) -> InferenceResult:
         """Run async inference on TensorRT-LLM server using httpx."""
         if not HTTPX_AVAILABLE:
             # Fallback to base class executor-based implementation
             return await super()._do_inference_async(
-                image, prompt, max_new_tokens, temperature, **kwargs
+                image, prompt, max_new_tokens, temperature, iteration, **kwargs
             )
 
         # Only OpenAI-compatible endpoint supports async streaming
         if self._server_type != "openai":
             return await super()._do_inference_async(
-                image, prompt, max_new_tokens, temperature, **kwargs
+                image, prompt, max_new_tokens, temperature, iteration, **kwargs
             )
 
         image_b64 = self._encode_image(image)
