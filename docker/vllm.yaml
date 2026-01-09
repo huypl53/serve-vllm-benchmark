@@ -3,7 +3,7 @@
 
 services:
   vllm-server:
-    image: vllm/vllm-openai:latest
+    image: nvcr.io/nvidia/vllm:25.12-py3
     container_name: vlm-benchmark-vllm
     environment:
       - NVIDIA_VISIBLE_DEVICES=all
