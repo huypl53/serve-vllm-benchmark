@@ -16,7 +16,7 @@ services:
       --model ${MODEL_ID:-Qwen/Qwen2.5-VL-7B-Instruct}
       --trust-remote-code
       --max-model-len ${MAX_MODEL_LEN:-8192}
-      --gpu-memory-utilization ${GPU_MEM_UTIL:-0.9}
+      --gpu-memory-utilization ${GPU_MEM_UTIL:-0.6}
       --host 0.0.0.0
       --port 8000
       --dtype auto
