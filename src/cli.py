@@ -12,6 +12,7 @@ from rich.table import Table
 from .benchmarker import BenchmarkRunner
 from .config import load_benchmark_config, load_models_config, get_gpu_profile
 from .metrics.gpu_monitor import get_gpu_info, detect_gpu_type
+from .output.merge_outputs import merge_model_output_csvs
 from .platforms import PLATFORM_REGISTRY
 
 console = Console()
@@ -239,6 +240,24 @@ def cmd_validate(args):
         return 1
 
 
+def cmd_merge_outputs(args):
+    """Merge model output CSVs into a single wide CSV."""
+    setup_logging(level=args.log_level or "INFO", log_file=args.log_file)
+
+    output_path = merge_model_output_csvs(
+        input_dir=args.input,
+        output_path=args.output,
+        pattern=args.pattern,
+    )
+
+    if not output_path:
+        console.print("[yellow]No model output CSVs found to merge[/yellow]")
+        return 1
+
+    console.print(f"[green]Merged model outputs saved to {output_path}[/green]")
+    return 0
+
+
 def main():
     """Main entry point."""
     parser = argparse.ArgumentParser(
@@ -390,6 +409,27 @@ def main():
         help="Path to folder containing images",
     )
 
+    # Merge model outputs command
+    merge_parser = subparsers.add_parser(
+        "merge-outputs",
+        help="Merge model output CSVs into a single wide CSV",
+        parents=[common_parser],
+    )
+    merge_parser.add_argument(
+        "--input",
+        default="./results",
+        help="Directory containing model_outputs_*.csv files",
+    )
+    merge_parser.add_argument(
+        "--output",
+        help="Output CSV path (default: <input>/model_outputs_merged.csv)",
+    )
+    merge_parser.add_argument(
+        "--pattern",
+        default="model_outputs_*.csv",
+        help="Glob pattern for model output CSVs",
+    )
+
     args = parser.parse_args()
 
     if not args.command:
@@ -403,6 +443,7 @@ def main():
         "list": cmd_list,
         "gpu-info": cmd_gpu_info,
         "validate": cmd_validate,
+        "merge-outputs": cmd_merge_outputs,
     }
 
     handler = commands.get(args.command)

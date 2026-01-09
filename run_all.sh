@@ -24,6 +24,7 @@ MODELS="qwen2.5-vl-7b"  # Start with one model
 VLLM_PORT=8000
 TGI_PORT=8080
 TENSORRT_PORT=8001
+MERGE_OUTPUTS=0
 
 # Parse arguments
 while [[ $# -gt 0 ]]; do
@@ -65,6 +66,10 @@ while [[ $# -gt 0 ]]; do
             MODELS="qwen2.5-vl-7b,qwen2.5-vl-7b-w8a8,qwen2.5-vl-3b,qwen2.5-vl-3b-w4a16,qwen3-vl-8b,qwen3-vl-4b,vistral-7b-chat,pangea-7b,lavy-instruct,qwen2.5-omni-3b"
             shift
             ;;
+        --merge-outputs)
+            MERGE_OUTPUTS=1
+            shift
+            ;;
         --help)
             echo "Usage: $0 [options]"
             echo ""
@@ -78,6 +83,7 @@ while [[ $# -gt 0 ]]; do
             echo "  --models LIST       Comma-separated models (default: qwen2.5-vl-7b)"
             echo "  --all-platforms     Test all platforms (vllm,tgi,tensorrt)"
             echo "  --all-models        Test all models"
+            echo "  --merge-outputs     Merge model_outputs_*.csv after benchmarks"
             echo ""
             echo "Example:"
             echo "  $0 --all-platforms --all-models --max-images 50"
@@ -303,3 +309,10 @@ echo ""
 echo "View combined summary:"
 echo "  cat $OUTPUT_DIR/benchmark_summary.csv"
 echo ""
+
+if [ "$MERGE_OUTPUTS" -eq 1 ]; then
+    echo "Merging model outputs..."
+    python -m src.cli merge-outputs --input "$OUTPUT_DIR"
+    echo "Merged outputs saved to: $OUTPUT_DIR/model_outputs_merged.csv"
+    echo ""
+fi
