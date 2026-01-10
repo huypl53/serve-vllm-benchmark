@@ -288,6 +288,56 @@ class BasePlatform(ABC):
                 error_message=str(e),
             )
 
+    def _bypass_image_cache(self, image: Image.Image, iteration: int) -> Image.Image:
+        """
+        Apply invisible pixel tweak to bypass vLLM's image caching.
+
+        This modifies a single pixel by a tiny amount (±1 RGB value) that is
+        imperceptible to the model but changes the image hash, preventing caching.
+
+        Args:
+            image: PIL Image to modify
+            iteration: Iteration number (determines which pixel to tweak)
+
+        Returns:
+            Modified PIL Image (copy, original is not changed)
+        """
+        # Create a copy to avoid modifying the original
+        tweaked = image.copy()
+
+        # Convert to RGB if needed
+        if tweaked.mode != "RGB":
+            tweaked = tweaked.convert("RGB")
+
+        # Load pixel data
+        pixels = tweaked.load()
+        if not pixels: return image
+
+        # Use iteration number to deterministically select a pixel
+        # This ensures each iteration gets a different tweak
+        width, height = tweaked.size
+        pixel_x = (iteration * 7) % width  # Prime number for better distribution
+        pixel_y = (iteration * 13) % height
+
+        # Get current pixel value
+        r, g, b = pixels[pixel_x, pixel_y]
+
+        # Apply tiny tweak (±1 to one channel)
+        # Using a deterministic pattern based on iteration
+        tweak_amount = 1 if (iteration % 2) == 0 else -1
+        channel = iteration % 3  # 0=R, 1=G, 2=B
+
+        if channel == 0:
+            r = max(0, min(255, r + tweak_amount))
+        elif channel == 1:
+            g = max(0, min(255, g + tweak_amount))
+        else:
+            b = max(0, min(255, b + tweak_amount))
+
+        # Set the tweaked pixel
+        pixels[pixel_x, pixel_y] = (r, g, b)
+
+        return tweaked
     def inference_with_retry(
         self,
         image: Image.Image,
