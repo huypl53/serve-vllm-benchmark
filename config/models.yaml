@@ -310,6 +310,24 @@ models:
       tensorrt:
         supported: false
 
+  kimi-vl-a3b-thinking:
+    huggingface_id: "moonshotai/Kimi-VL-A3B-Thinking-2506"
+    display_name: "Kimi-VL-A3B-Thinking"
+    memory_estimate_gb: 8
+    min_vram_gb: 6
+    platforms:
+      vllm:
+        supported: true
+        args:
+          trust_remote_code: true
+          max_model_len: 8192
+          gpu_memory_utilization: 0.9
+          limit_mm_per_prompt: 1
+      tgi:
+        supported: false
+      tensorrt:
+        supported: false
+
 # GPU Profiles for automatic model selection
 gpu_profiles:
   T4:
@@ -328,6 +346,7 @@ gpu_profiles:
       - qwen3-vl-8b
       - lavy-instruct
       - qwen2.5-omni-3b
+      - kimi-vl-a3b-thinking
     notes: "Limited VRAM, prefer smaller models or quantization"
 
   L4:
@@ -348,6 +367,7 @@ gpu_profiles:
       - vistral-7b-chat
       - pangea-7b
       - qwen2.5-omni-3b
+      - kimi-vl-a3b-thinking
     notes: "Good for most models"
 
   A10:
@@ -368,6 +388,7 @@ gpu_profiles:
       - vistral-7b-chat
       - pangea-7b
       - qwen2.5-omni-3b
+      - kimi-vl-a3b-thinking
     notes: "Good for most models"
 
   A100:
@@ -388,4 +409,5 @@ gpu_profiles:
       - vistral-7b-chat
       - pangea-7b
       - qwen2.5-omni-3b
+      - kimi-vl-a3b-thinking
     notes: "Can run all models without quantization"

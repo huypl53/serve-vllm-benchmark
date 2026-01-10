@@ -63,7 +63,7 @@ while [[ $# -gt 0 ]]; do
             ;;
         --all-models)
             # MODELS="qwen2.5-vl-7b,qwen2.5-vl-7b-w8a8,qwen2.5-vl-3b,qwen2.5-vl-3b-w4a16,qwen3-vl-8b,qwen3-vl-4b,internvl3.5-2b,internvl3.5-4b,internvl3.5-1b,erax-vl-2b,vintern-1b,vistral-7b-chat,pangea-7b,lavy-instruct"
-            MODELS="qwen2.5-vl-7b,qwen2.5-vl-7b-w8a8,qwen2.5-vl-3b,qwen2.5-vl-3b-w4a16,qwen3-vl-8b,qwen3-vl-4b,vistral-7b-chat,pangea-7b,lavy-instruct,qwen2.5-omni-3b"
+            MODELS="qwen2.5-vl-7b,qwen2.5-vl-7b-w8a8,qwen2.5-vl-3b,qwen2.5-vl-3b-w4a16,qwen3-vl-8b,qwen3-vl-4b,vistral-7b-chat,pangea-7b,lavy-instruct,qwen2.5-omni-3b,kimi-vl-a3b-thinking"
             shift
             ;;
         --merge-outputs)
