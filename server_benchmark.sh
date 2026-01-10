@@ -33,4 +33,4 @@ unzip -o "${tmp_zip}" -d images
 rm -f "${tmp_zip}"
 
 # Run benchmark.
-bash ./run_all.sh --all-platforms --all-models --max-images 10 --concurrency 2
+bash ./run_all.sh --platforms vllm --all-models --max-images 50 --concurrency 50
