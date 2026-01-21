@@ -4,6 +4,7 @@ from .base import BasePlatform, InferenceResult, ModelInfo
 from .vllm_platform import VLLMPlatform
 from .tgi_platform import TGIPlatform
 from .tensorrt_platform import TensorRTPlatform
+from .lmdeploy_platform import LMdeployPlatform
 
 __all__ = [
     "BasePlatform",
@@ -12,6 +13,7 @@ __all__ = [
     "VLLMPlatform",
     "TGIPlatform",
     "TensorRTPlatform",
+    "LMdeployPlatform",
 ]
 
 # Platform registry for dynamic instantiation
@@ -19,6 +21,7 @@ PLATFORM_REGISTRY = {
     "vllm": VLLMPlatform,
     "tgi": TGIPlatform,
     "tensorrt": TensorRTPlatform,
+    "lmdeploy": LMdeployPlatform,
 }
 
 

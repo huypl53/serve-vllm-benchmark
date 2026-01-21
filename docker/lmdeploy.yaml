@@ -1,0 +1,54 @@
+# LMdeploy Docker Compose Configuration
+# Usage: MODEL_ID=Qwen/Qwen2.5-VL-7B-Instruct docker compose -f docker/lmdeploy.yaml up -d
+
+services:
+  lmdeploy-server:
+    image: openmmlab/lmdeploy:latest
+    container_name: vlm-benchmark-lmdeploy
+    environment:
+      - NVIDIA_VISIBLE_DEVICES=all
+      - HUGGING_FACE_HUB_TOKEN=${HF_TOKEN:-${HUGGING_FACE_HUB_TOKEN:-}}
+    ports:
+      - "${LMDEPLOY_PORT:-23333}:23333"
+    volumes:
+      - ${HF_CACHE:-~/.cache/huggingface}:/root/.cache/huggingface
+    command: >
+      lmdeploy serve api_server
+      ${MODEL_ID:-Qwen/Qwen2.5-VL-7B-Instruct}
+      --server-port 23333
+      --backend pytorch
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:23333/v1/models"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 120s
+    restart: unless-stopped
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "100m"
+        max-file: "3"
+
+  prometheus:
+    image: prom/prometheus:latest
+    extra_hosts:
+      - "host.docker.internal:host-gateway" # allow a direct connection from container to the local machine
+    ports:
+      - "9090:9090" # the default port used by Prometheus
+    volumes:
+      - ./prometheus.yaml:/etc/prometheus/prometheus.yml # mount Prometheus config file
+
+  grafana:
+    image: grafana/grafana:latest
+    depends_on:
+      - prometheus
+    ports:
+      - "3000:3000" # the default port used by Grafana

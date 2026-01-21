@@ -15,6 +15,10 @@ models:
           max_model_len: 8192
           gpu_memory_utilization: 0.9
           limit_mm_per_prompt: 1
+      lmdeploy:
+        supported: true
+        args:
+          backend: pytorch
       tgi:
         supported: true
         args:
@@ -38,6 +42,10 @@ models:
           max_model_len: 8192
           gpu_memory_utilization: 0.9
           limit_mm_per_prompt: 1
+      lmdeploy:
+        supported: true
+        args:
+          backend: pytorch
       tgi:
         supported: true
         args:
@@ -120,6 +128,10 @@ models:
           max_model_len: 8192
           gpu_memory_utilization: 0.9
           limit_mm_per_prompt: 1
+      lmdeploy:
+        supported: true
+        args:
+          backend: pytorch
       tgi:
         supported: false # TGI doesn't support qwen3_vl architecture yet
       tensorrt:
@@ -139,6 +151,10 @@ models:
           trust_remote_code: true
           max_model_len: 8192
           gpu_memory_utilization: 0.9
+      lmdeploy:
+        supported: true
+        args:
+          backend: pytorch
       tgi:
         supported: true
         args:
@@ -161,6 +177,10 @@ models:
           trust_remote_code: true
           max_model_len: 8192
           gpu_memory_utilization: 0.9
+      lmdeploy:
+        supported: true
+        args:
+          backend: pytorch
       tgi:
         supported: true
         args:
@@ -183,6 +203,10 @@ models:
           trust_remote_code: true
           max_model_len: 8192
           gpu_memory_utilization: 0.9
+      lmdeploy:
+        supported: true
+        args:
+          backend: pytorch
       tgi:
         supported: true
         args:
@@ -310,6 +334,47 @@ models:
       tensorrt:
         supported: false
 
+  deepseek-vl2-tiny:
+    huggingface_id: "deepseek-ai/deepseek-vl2-tiny"
+    display_name: "DeepSeek-VL2-Tiny"
+    memory_estimate_gb: 6
+    min_vram_gb: 6
+    platforms:
+      vllm:
+        supported: false  # Not supported by vLLM yet (as of Jan 2026)
+      lmdeploy:
+        supported: true
+        args:
+          backend: pytorch
+      tgi:
+        supported: false
+      tensorrt:
+        supported: false
+
+  qwen3-vl-2b:
+    huggingface_id: "Qwen/Qwen3-VL-2B-Instruct"
+    display_name: "Qwen3-VL-2B"
+    memory_estimate_gb: 6
+    min_vram_gb: 6
+    platforms:
+      vllm:
+        supported: true
+        args:
+          trust_remote_code: true
+          max_model_len: 8192
+          gpu_memory_utilization: 0.9
+          limit_mm_per_prompt: 1
+      lmdeploy:
+        supported: true
+        args:
+          backend: pytorch
+      tgi:
+        supported: false  # TGI doesn't support qwen3_vl architecture yet
+      tensorrt:
+        supported: true
+        backend: pytorch
+        args: {}
+
 # GPU Profiles for automatic model selection
 gpu_profiles:
   T4:
@@ -319,6 +384,8 @@ gpu_profiles:
       - internvl3.5-2b
       - vintern-1b
       - erax-vl-2b
+      - deepseek-vl2-tiny
+      - qwen3-vl-2b
       - qwen2.5-vl-3b
       - qwen2.5-vl-3b-w4a16
       - qwen3-vl-4b
@@ -338,6 +405,8 @@ gpu_profiles:
       - internvl3.5-2b
       - vintern-1b
       - erax-vl-2b
+      - deepseek-vl2-tiny
+      - qwen3-vl-2b
       - qwen2.5-vl-3b
       - qwen2.5-vl-3b-w4a16
       - qwen3-vl-4b
@@ -358,6 +427,8 @@ gpu_profiles:
       - internvl3.5-2b
       - vintern-1b
       - erax-vl-2b
+      - deepseek-vl2-tiny
+      - qwen3-vl-2b
       - qwen2.5-vl-3b
       - qwen2.5-vl-3b-w4a16
       - qwen3-vl-4b
@@ -378,6 +449,8 @@ gpu_profiles:
       - internvl3.5-2b
       - vintern-1b
       - erax-vl-2b
+      - deepseek-vl2-tiny
+      - qwen3-vl-2b
       - qwen2.5-vl-3b
       - qwen2.5-vl-3b-w4a16
       - qwen3-vl-4b

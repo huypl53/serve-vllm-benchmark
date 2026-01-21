@@ -147,6 +147,7 @@ def cmd_list(args):
     table.add_column("HuggingFace ID", style="dim")
     table.add_column("VRAM (GB)", style="yellow")
     table.add_column("vLLM", style="green")
+    table.add_column("LMdeploy", style="green")
     table.add_column("TGI", style="green")
     table.add_column("TensorRT", style="green")
 
@@ -157,6 +158,7 @@ def cmd_list(args):
             cfg.huggingface_id,
             str(cfg.memory_estimate_gb),
             "Yes" if cfg.platforms.get("vllm", {}).get("supported") else "No",
+            "Yes" if cfg.platforms.get("lmdeploy", {}).get("supported") else "No",
             "Yes" if cfg.platforms.get("tgi", {}).get("supported") else "No",
             "Yes" if cfg.platforms.get("tensorrt", {}).get("supported") else "No",
         )

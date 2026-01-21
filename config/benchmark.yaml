@@ -32,6 +32,7 @@ server:
   # Port mappings
   ports:
     vllm: 8000
+    lmdeploy: 23333
     tgi: 8080
     tensorrt: 8001
 

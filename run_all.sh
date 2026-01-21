@@ -19,9 +19,10 @@ OUTPUT_DIR="./results"
 MAX_IMAGES=""
 PROMPT=""
 CONCURRENCY=""  # Number of concurrent requests (empty = use config default)
-PLATFORMS="vllm"  # Start with vLLM only by default
+PLATFORMS="vllm,lmdeploy"  # Default platforms
 MODELS="qwen2.5-vl-7b"  # Start with one model
 VLLM_PORT=8000
+LMDEPLOY_PORT=23333
 TGI_PORT=8080
 TENSORRT_PORT=8001
 MERGE_OUTPUTS=0
@@ -58,13 +59,13 @@ while [[ $# -gt 0 ]]; do
             shift 2
             ;;
         --all-platforms)
-            PLATFORMS="vllm,tgi,tensorrt"
+            PLATFORMS="vllm,lmdeploy"
             shift
             ;;
         --all-models)
-            # MODELS="qwen2.5-vl-7b,qwen2.5-vl-7b-w8a8,qwen2.5-vl-3b,qwen2.5-vl-3b-w4a16,qwen3-vl-8b,qwen3-vl-4b,internvl3.5-2b,internvl3.5-4b,internvl3.5-1b,erax-vl-2b,vintern-1b,pangea-7b,lavy-instruct"
+            # MODELS="qwen2.5-vl-7b,qwen2.5-vl-7b-w8a8,qwen2.5-vl-3b,qwen2.5-vl-3b-w4a16,qwen3-vl-8b,qwen3-vl-4b,qwen3-vl-2b,internvl3.5-2b,internvl3.5-4b,internvl3.5-1b,erax-vl-2b,vintern-1b,pangea-7b,lavy-instruct,deepseek-vl2-tiny"
             # pangea-7b: incompatible  model architecture
-            MODELS="qwen2.5-vl-7b,qwen2.5-vl-7b-w8a8,qwen2.5-vl-3b,qwen2.5-vl-3b-w4a16,qwen3-vl-8b,qwen3-vl-4b,lavy-instruct,qwen2.5-omni-3b,kimi-vl-a3b-thinking"
+            MODELS="qwen2.5-vl-7b,qwen2.5-vl-7b-w8a8,qwen2.5-vl-3b,qwen2.5-vl-3b-w4a16,qwen3-vl-8b,qwen3-vl-4b,qwen3-vl-2b,lavy-instruct,qwen2.5-omni-3b,kimi-vl-a3b-thinking,deepseek-vl2-tiny"
             shift
             ;;
         --merge-outputs)
@@ -80,9 +81,9 @@ while [[ $# -gt 0 ]]; do
             echo "  --max-images N      Max images to process"
             echo "  --prompt TEXT       VQA prompt"
             echo "  --concurrency N     Number of concurrent requests (default: 1)"
-            echo "  --platforms LIST    Comma-separated platforms (default: vllm)"
+            echo "  --platforms LIST    Comma-separated platforms (default: vllm,lmdeploy)"
             echo "  --models LIST       Comma-separated models (default: qwen2.5-vl-7b)"
-            echo "  --all-platforms     Test all platforms (vllm,tgi,tensorrt)"
+            echo "  --all-platforms     Test all platforms (vllm,lmdeploy)"
             echo "  --all-models        Test all models"
             echo "  --merge-outputs     Merge model_outputs_*.csv after benchmarks"
             echo ""
@@ -167,6 +168,10 @@ print(model_config.get('huggingface_id', '$model'))
             docker compose -f docker/vllm.yaml up -d
             wait_for_server "http://localhost:$VLLM_PORT/v1/models"
             ;;
+        lmdeploy)
+            docker compose -f docker/lmdeploy.yaml up -d
+            wait_for_server "http://localhost:$LMDEPLOY_PORT/v1/models"
+            ;;
         tgi)
             docker compose -f docker/tgi.yaml up -d
             wait_for_server "http://localhost:$TGI_PORT/health"
@@ -206,6 +211,7 @@ stop_server() {
 
     case $platform in
         vllm) docker compose -f docker/vllm.yaml down ;;
+        lmdeploy) docker compose -f docker/lmdeploy.yaml down ;;
         tgi) docker compose -f docker/tgi.yaml down ;;
         tensorrt) docker compose -f docker/tensorrt.yaml --profile serve down ;;
     esac
@@ -258,6 +264,7 @@ for platform in "${PLATFORM_LIST[@]}"; do
     # Get server URL
     case $platform in
         vllm) SERVER_URL="http://localhost:$VLLM_PORT" ;;
+        lmdeploy) SERVER_URL="http://localhost:$LMDEPLOY_PORT" ;;
         tgi) SERVER_URL="http://localhost:$TGI_PORT" ;;
         tensorrt) SERVER_URL="http://localhost:$TENSORRT_PORT" ;;
     esac
